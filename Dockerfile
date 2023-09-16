@@ -7,7 +7,7 @@ EXPOSE 8080
 
 USER 0
 
-RUN yum -y install nodejs module enable nodejs:$NODEJS_VERSION && \
+RUN yum -y install nodejs
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
 COPY ./s2i/bin/ $STI_SCRIPTS_PATH
