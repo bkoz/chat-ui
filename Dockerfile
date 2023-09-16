@@ -8,7 +8,7 @@ EXPOSE 8080
 USER 0
 
 RUN dnf search nodejs
-RUN dnf -y install nodejs
+RUN dnf -y install nodejs20
 
 ENV APP_ROOT=/opt/app-root
 RUN mkdir -p ${APP_ROOT}/{bin,src} && \
