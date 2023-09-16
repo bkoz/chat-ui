@@ -1,4 +1,4 @@
-FROM ubi9/s2i-core:rhel9.2.0
+FROM ubi8/python-311
 
 # This image provides a Node.JS environment you can use to run your Node.JS
 # applications.
