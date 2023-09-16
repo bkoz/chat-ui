@@ -1,4 +1,4 @@
-FROM ubi8/python-311
+FROM ubi9
 
 # This image provides a Node.JS environment you can use to run your Node.JS
 # applications.
