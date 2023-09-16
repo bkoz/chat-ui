@@ -5,11 +5,9 @@ FROM node:19 as builder-production
 
 USER 0
 
-WORKDIR /app
+# WORKDIR /app
 
 ENV APP_ROOT=/app
-RUN mkdir -p ${APP_ROOT}/{bin,src}
-
 RUN mkdir -p ${APP_ROOT}/{bin,src}
 RUN chmod -R u+x ${APP_ROOT}/bin
 RUN chgrp -R 0 ${APP_ROOT}
