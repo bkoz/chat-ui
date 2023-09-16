@@ -1,4 +1,4 @@
-FROM fedora38
+FROM dokken/fedora-latest
 
 # This image provides a Node.JS environment you can use to run your Node.JS
 # applications.
