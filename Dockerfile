@@ -10,8 +10,11 @@ WORKDIR /app
 ENV APP_ROOT=/app
 RUN mkdir -p ${APP_ROOT}/{bin,src}
 
-RUN mkdir -p ${APP_ROOT}/{bin,src} && \
-    chmod -R u+x ${APP_ROOT}/bin && chgrp -R 0 ${APP_ROOT} && chmod -R g=u ${APP_ROOT}
+RUN mkdir -p ${APP_ROOT}/{bin,src}
+RUN chmod -R u+x ${APP_ROOT}/bin
+RUN chgrp -R 0 ${APP_ROOT}
+RUN chmod -R g=u ${APP_ROOT}
+
 ENV PATH=${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
 
 COPY --chown=1000:1000 package-lock.json package.json ./
