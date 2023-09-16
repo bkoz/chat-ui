@@ -3,6 +3,8 @@
 # you will also find guides on how best to write your Dockerfile
 FROM node:19 as builder-production
 
+USER 0
+
 WORKDIR /app
 
 ENV APP_ROOT=/app
