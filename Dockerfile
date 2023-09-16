@@ -52,6 +52,7 @@ LABEL summary="$SUMMARY" \
       maintainer="SoftwareCollections.org <sclorg@redhat.com>" \
       help="For more information visit https://github.com/sclorg/s2i-nodejs-container" \
       usage="s2i build <SOURCE-REPOSITORY> ubi9/$NAME-$NODEJS_VERSION:latest <APP-NAME>"
+USER 0
 
 RUN yum -y module enable nodejs:$NODEJS_VERSION && \
     MODULE_DEPS="make gcc gcc-c++ git openssl-devel" && \
