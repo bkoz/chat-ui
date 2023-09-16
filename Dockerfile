@@ -1,4 +1,4 @@
-FROM ubi9
+FROM fedora38
 
 # This image provides a Node.JS environment you can use to run your Node.JS
 # applications.
@@ -7,8 +7,8 @@ EXPOSE 8080
 
 USER 0
 
-RUN yum search nodejs
-RUN yum -y install nodejs18
+RUN dnf search nodejs
+RUN dnf -y install nodejs18
 
 ENV APP_ROOT=/opt/app-root
 RUN mkdir -p ${APP_ROOT}/{bin,src} && \
