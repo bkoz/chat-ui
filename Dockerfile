@@ -9,17 +9,19 @@ USER 0
 
 RUN yum -y install nodejs
 
-# Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
-COPY ./s2i/bin/ $STI_SCRIPTS_PATH
+ENV APP_ROOT=/opt/app-root
+RUN mkdir -p ${APP_ROOT}/{bin,src} && \
+    chmod -R u+x ${APP_ROOT}/bin && chgrp -R 0 ${APP_ROOT} && chmod -R g=u ${APP_ROOT}
+ENV PATH=${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
 
-# Copy extra files to the image.
-COPY ./root/ /
-
-# Drop the root user and make the content of /opt/app-root owned by user 1001
-RUN chown -R 1001:0 ${APP_ROOT} && chmod -R ug+rwx ${APP_ROOT} && \
-    rpm-file-permissions
+WORKDIR ${APP_ROOT}/src
+COPY . ${APP_ROOT}/src
 
 USER 1001
 
-# Set the default CMD to print the usage of the language image
-CMD $STI_SCRIPTS_PATH/usage
+RUN npm install
+
+VOLUME ${APP_ROOT}/logs ${APP_ROOT}/models
+
+CMD npm run dev
+
