@@ -1,45 +1,78 @@
-# syntax=docker/dockerfile:1
-# read the doc: https://huggingface.co/docs/hub/spaces-sdks-docker
-# you will also find guides on how best to write your Dockerfile
-FROM node:19 as builder-production
+FROM ubi9/s2i-core:rhel9.2.0
 
-USER 0
+# This image provides a Node.JS environment you can use to run your Node.JS
+# applications.
 
-# WORKDIR /app
+EXPOSE 8080
 
-ENV APP_ROOT=/app
-RUN mkdir -p ${APP_ROOT}/{bin,src}
-RUN chmod -R u+x ${APP_ROOT}/bin
-RUN chgrp -R 0 ${APP_ROOT}
-RUN chmod -R g=u ${APP_ROOT}
+# Add $HOME/node_modules/.bin to the $PATH, allowing user to make npm scripts
+# available on the CLI without using npm's --global installation mode
+# This image will be initialized with "npm run $NPM_RUN"
+# See https://docs.npmjs.com/misc/scripts, and your repo's package.json
+# file for possible values of NPM_RUN
+# Description
+# Environment:
+# * $NPM_RUN - Select an alternate / custom runtime mode, defined in your package.json files' scripts section (default: npm run "start").
+# Expose ports:
+# * 8080 - Unprivileged port used by nodejs application
 
-ENV PATH=${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
+ENV NODEJS_VERSION=18 \
+    NPM_RUN=start \
+    NAME=nodejs \
+    NPM_CONFIG_PREFIX=$HOME/.npm-global \
+    PATH=$HOME/node_modules/.bin/:$HOME/.npm-global/bin/:$PATH \
+    CNB_STACK_ID=com.redhat.stacks.ubi9-nodejs-18 \
+    CNB_USER_ID=1001 \
+    CNB_GROUP_ID=0
 
-COPY --chown=1000:1000 package-lock.json package.json ./
-RUN --mount=type=cache,target=/app/.npm \
-        npm set cache /app/.npm && \
-        npm ci --omit=dev
+ENV SUMMARY="Platform for building and running Node.js $NODEJS_VERSION applications" \
+    DESCRIPTION="Node.js $NODEJS_VERSION available as container is a base platform for \
+building and running various Node.js $NODEJS_VERSION applications and frameworks. \
+Node.js is a platform built on Chrome's JavaScript runtime for easily building \
+fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model \
+that makes it lightweight and efficient, perfect for data-intensive real-time applications \
+that run across distributed devices."
 
-FROM builder-production as builder
+LABEL summary="$SUMMARY" \
+      description="$DESCRIPTION" \
+      io.k8s.description="$DESCRIPTION" \
+      io.k8s.display-name="Node.js $NODEJS_VERSION" \
+      io.openshift.expose-services="8080:http" \
+      io.openshift.tags="builder,$NAME,${NAME}${NODEJS_VERSION}" \
+      io.openshift.s2i.scripts-url="image:///usr/libexec/s2i" \
+      io.s2i.scripts-url="image:///usr/libexec/s2i" \
+      io.buildpacks.stack.id="com.redhat.stacks.ubi9-nodejs-18" \
+      com.redhat.dev-mode="DEV_MODE:false" \
+      com.redhat.deployments-dir="${APP_ROOT}/src" \
+      com.redhat.dev-mode.port="DEBUG_PORT:5858" \
+      com.redhat.component="${NAME}-${NODEJS_VERSION}-container" \
+      name="ubi9/$NAME-$NODEJS_VERSION" \
+      version="1" \
+      com.redhat.license_terms="https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI" \
+      maintainer="SoftwareCollections.org <sclorg@redhat.com>" \
+      help="For more information visit https://github.com/sclorg/s2i-nodejs-container" \
+      usage="s2i build <SOURCE-REPOSITORY> ubi9/$NAME-$NODEJS_VERSION:latest <APP-NAME>"
 
-RUN --mount=type=cache,target=/app/.npm \
-        npm set cache /app/.npm && \
-        npm ci
+RUN yum -y module enable nodejs:$NODEJS_VERSION && \
+    MODULE_DEPS="make gcc gcc-c++ git openssl-devel" && \
+    INSTALL_PKGS="$MODULE_DEPS nodejs npm nodejs-nodemon nss_wrapper" && \
+    ln -s /usr/lib/node_modules/nodemon/bin/nodemon.js /usr/bin/nodemon && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    node -v | grep -qe "^v$NODEJS_VERSION\." && echo "Found VERSION $NODEJS_VERSION" && \
+    yum -y clean all --enablerepo='*'
 
-COPY --chown=1000:1000 . .
+# Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
+COPY ./s2i/bin/ $STI_SCRIPTS_PATH
 
-USER 1000
+# Copy extra files to the image.
+COPY ./root/ /
 
-# RUN --mount=type=secret,id=DOTENV_LOCAL,dst=.env.local \
-#     npm run build
-RUN npm run build
+# Drop the root user and make the content of /opt/app-root owned by user 1001
+RUN chown -R 1001:0 ${APP_ROOT} && chmod -R ug+rwx ${APP_ROOT} && \
+    rpm-file-permissions
 
-FROM node:19-slim
+USER 1001
 
-RUN npm install -g pm2
-
-COPY --from=builder-production /app/node_modules /app/node_modules
-COPY --chown=1000:1000 package.json /app/package.json
-COPY --from=builder /app/build /app/build
-
-CMD pm2 start /app/build/index.js -i $CPU_CORES --no-daemon
+# Set the default CMD to print the usage of the language image
+CMD $STI_SCRIPTS_PATH/usage
