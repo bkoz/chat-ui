@@ -7,7 +7,8 @@ EXPOSE 8080
 
 USER 0
 
-RUN yum -y install nodejs
+RUN yum search nodejs
+RUN yum -y install nodejs18
 
 ENV APP_ROOT=/opt/app-root
 RUN mkdir -p ${APP_ROOT}/{bin,src} && \
