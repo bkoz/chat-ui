@@ -18,8 +18,9 @@ RUN --mount=type=cache,target=/app/.npm \
 
 COPY --chown=1000:1000 . .
 
-RUN --mount=type=secret,id=DOTENV_LOCAL,dst=.env.local \
-    npm run build
+# RUN --mount=type=secret,id=DOTENV_LOCAL,dst=.env.local \
+#     npm run build
+RUN npm run build
 
 FROM node:19-slim
 
