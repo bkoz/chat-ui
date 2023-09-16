@@ -5,6 +5,11 @@ FROM node:19 as builder-production
 
 WORKDIR /app
 
+ENV APP_ROOT=/app
+RUN mkdir -p ${APP_ROOT}/{bin,src} && \
+    chmod -R u+x ${APP_ROOT}/bin && chgrp -R 0 ${APP_ROOT} && chmod -R g=u ${APP_ROOT}
+ENV PATH=${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
+
 COPY --chown=1000:1000 package-lock.json package.json ./
 RUN --mount=type=cache,target=/app/.npm \
         npm set cache /app/.npm && \
@@ -17,6 +22,8 @@ RUN --mount=type=cache,target=/app/.npm \
         npm ci
 
 COPY --chown=1000:1000 . .
+
+USER 1000
 
 # RUN --mount=type=secret,id=DOTENV_LOCAL,dst=.env.local \
 #     npm run build
