@@ -20,6 +20,8 @@ COPY . ${APP_ROOT}/src
 
 RUN npm install
 
+RUN chmod 777 ${APP_ROOT}/src/.svelte-kit/tsconfig.json
+
 VOLUME ${APP_ROOT}/logs ${APP_ROOT}/models
 
 # USER 1001
