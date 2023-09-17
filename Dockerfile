@@ -14,7 +14,7 @@ COPY . ${APP_ROOT}/src
 
 RUN npm install
 
-RUN chmod -R ug+x ${APP_ROOT}/src
+RUN chmod -R ug+rw ${APP_ROOT}/src
 
 EXPOSE 5173
 CMD npm run dev -- --host=0.0.0.0
