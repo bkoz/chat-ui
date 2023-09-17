@@ -22,7 +22,7 @@ RUN npm install
 
 VOLUME ${APP_ROOT}/logs ${APP_ROOT}/models
 
-USER 1001
+# USER 1001
 
 CMD npm run dev
 
