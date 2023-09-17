@@ -2,7 +2,6 @@
 FROM dokken/fedora-latest
 USER 0
 
-RUN dnf search nodejs
 RUN dnf -y install nodejs nodejs20
 
 ENV APP_ROOT=/opt/app-root
@@ -15,7 +14,7 @@ COPY . ${APP_ROOT}/src
 
 RUN npm install
 
-RUN chmod -R chmod -R u+x ${APP_ROOT}/src
+RUN chmod -R ug+x ${APP_ROOT}/src
 
 EXPOSE 5173
 CMD npm run dev -- --host=0.0.0.0
