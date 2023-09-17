@@ -3,7 +3,7 @@ FROM dokken/fedora-latest
 # This image provides a Node.JS environment you can use to run your Node.JS
 # applications.
 
-EXPOSE 8080
+EXPOSE 5173
 
 USER 0
 
@@ -26,5 +26,5 @@ VOLUME ${APP_ROOT}/logs ${APP_ROOT}/models
 
 # USER 1001
 
-CMD npm run dev
+CMD npm run dev --host=0.0.0.0
 
