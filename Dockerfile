@@ -20,7 +20,7 @@ COPY . ${APP_ROOT}/src
 
 RUN npm install
 
-RUN chmod -R 777 ${APP_ROOT}/src/.svelte-kit
+RUN chmod -R 777 ${APP_ROOT}/src
 
 VOLUME ${APP_ROOT}/logs ${APP_ROOT}/models
 
