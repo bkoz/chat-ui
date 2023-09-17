@@ -1,5 +1,7 @@
 # Build the chat-ui container
-FROM dokken/fedora-latest
+# FROM dokken/fedora-latest
+FROM fedora:latest
+
 USER 0
 
 RUN dnf -y install nodejs nodejs20
