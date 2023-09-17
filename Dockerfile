@@ -18,11 +18,11 @@ ENV PATH=${APP_ROOT}/bin:${PATH} HOME=${APP_ROOT}
 WORKDIR ${APP_ROOT}/src
 COPY . ${APP_ROOT}/src
 
-USER 1001
-
 RUN npm install
 
 VOLUME ${APP_ROOT}/logs ${APP_ROOT}/models
+
+USER 1001
 
 CMD npm run dev
 
