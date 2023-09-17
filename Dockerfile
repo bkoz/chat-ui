@@ -1,3 +1,4 @@
+# Build the chat-ui container
 FROM dokken/fedora-latest
 USER 0
 
