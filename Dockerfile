@@ -1,10 +1,4 @@
 FROM dokken/fedora-latest
-
-# This image provides a Node.JS environment you can use to run your Node.JS
-# applications.
-
-EXPOSE 5173
-
 USER 0
 
 RUN dnf search nodejs
@@ -20,11 +14,8 @@ COPY . ${APP_ROOT}/src
 
 RUN npm install
 
-RUN chmod -R 777 ${APP_ROOT}/src
+RUN chmod -R chmod -R u+x ${APP_ROOT}/src
 
-VOLUME ${APP_ROOT}/logs ${APP_ROOT}/models
-
-# USER 1001
-
+EXPOSE 5173
 CMD npm run dev -- --host=0.0.0.0
 
